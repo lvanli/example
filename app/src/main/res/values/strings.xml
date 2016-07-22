@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Practise</string>
+    <string name="loading">加载动画</string>
+    <string name="audio">音频</string>
+    <string name="handle">handle</string>
+    <string name="coordinator">滑动隐藏</string>
+    <string name="viewpager">viewpager</string>
+    <string name="recycleview">recycleView</string>
+    <string name="fragment">fragment</string>
+    <string name="service">Service</string>
+    <string name="float_menu">趣味菜单</string>
+    <string name="widget">控件测试</string>
+    <string name="download">下载</string>
+    <string name="mkwUrl">http://www.imooc.com/mobile/mukewang.apk</string>
+    <string name="begin">开始</string>
+    <string name="pause">暂停</string>
+    <string name="tip">请输入url</string>
+    <integer name="load_speed">150</integer>
+</resources>
