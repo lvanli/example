@@ -9,8 +9,13 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -26,12 +31,20 @@ public class DownloadService extends Service {
     public static final String INFORMATION = "fileInfo";
     public static final int ACTION_INIT = 1;
     private static final String PATH = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download/";
+    private static final int FINISH = 2;
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case ACTION_INIT:
                     Log.d(TAG, "handleMessage: what="+msg.what+",obj="+msg.obj.toString());
+                    DownLoadThread thread = new DownLoadThread((FileInfo) msg.obj);
+                    thread.start();
+                    break;
+                case FINISH:
+                    Intent intent = new Intent();
+                    intent.setAction(DownLoadManager.ACTION_FINISH);
+                    sendBroadcast(intent);
                     break;
             }
         }
@@ -46,17 +59,17 @@ public class DownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         FileInfo fileInfo;
-        DownLoadThread thread;
+        DownLoadPreThread thread;
         if (ACTION_START.equals(intent.getAction())) {
             fileInfo = (FileInfo) intent.getSerializableExtra(INFORMATION);
             Log.d(TAG, "onStartCommand: start:"+fileInfo.toString());
-            thread = new DownLoadThread(fileInfo);
+            thread = new DownLoadPreThread(fileInfo);
             thread.start();
         }
         else if (ACTION_STOP.equals(intent.getAction())) {
             fileInfo = (FileInfo) intent.getSerializableExtra(INFORMATION);
             Log.d(TAG, "onStartCommand: stop:"+fileInfo.toString());
-            thread = new DownLoadThread(fileInfo);
+            thread = new DownLoadPreThread(fileInfo);
             thread.start();
         }
         return super.onStartCommand(intent, flags, startId);
@@ -64,7 +77,45 @@ public class DownloadService extends Service {
     class DownLoadThread extends Thread {
         private FileInfo mFileInfo = null;
 
-        public DownLoadThread(FileInfo fileInfo) {
+        public DownLoadThread(FileInfo mFileInfo) {
+            this.mFileInfo = mFileInfo;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(mFileInfo.getUrl());
+                connection = (HttpURLConnection) url.openConnection();
+                InputStream is = connection.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader reader = new BufferedReader(isr);
+                char buffer[] = new char[4*1024*1024];
+                FileOutputStream outputStream = new FileOutputStream(PATH+mFileInfo.getName(),false);
+                OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+                while (reader.read(buffer) > 0) {
+                    Log.d(TAG, "run: get 4M!");
+                    writer.write(buffer);
+                }
+                reader.close();
+                isr.close();
+                is.close();
+                writer.close();
+                outputStream.close();
+                mHandler.obtainMessage(FINISH,mFileInfo).sendToTarget();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            finally {
+                connection.disconnect();
+            }
+        }
+    }
+    class DownLoadPreThread extends Thread {
+        private FileInfo mFileInfo = null;
+
+        public DownLoadPreThread(FileInfo fileInfo) {
             this.mFileInfo = fileInfo;
         }
 
@@ -82,6 +133,7 @@ public class DownloadService extends Service {
                 if (connection.getResponseCode() == 200) {
                     length = connection.getContentLength();
                 }
+                Log.d(TAG, "run: length="+length);
                 if (length <= 0)
                     return;
                 File dir = new File(PATH);
@@ -92,18 +144,14 @@ public class DownloadService extends Service {
                 accessFile = new RandomAccessFile(file,"rwd");
                 accessFile.setLength(length);
                 mFileInfo.setLength(length);
-                mHandler.obtainMessage(ACTION_INIT,mFileInfo);
+                mHandler.obtainMessage(ACTION_INIT,mFileInfo).sendToTarget();
+                accessFile.close();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }finally {
-                try {
-                    connection.disconnect();
-                    accessFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                connection.disconnect();
             }
 
         }
