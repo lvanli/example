@@ -17,9 +17,15 @@ import android.widget.Toast;
 public class DownLoadManager extends BroadcastReceiver implements ServiceConnection {
     Context mContext;
     private static final String TAG = "DownLoadManager";
+    public static final String ACTION_PROGRESS = "com.practise.lizhiguang.action.progress";
     public static final String ACTION_FINISH = "com.practise.lizhiguang.action.finish";
+    public static final String PROGRESS_INFO = "progress";
+    private IntentFilter filter;
     public DownLoadManager(Context context) {
         mContext = context;
+        filter = new IntentFilter();
+        filter.addAction(ACTION_FINISH);
+        filter.addAction(ACTION_PROGRESS);
     }
 
     @Override
@@ -36,6 +42,7 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         intent.setClass(mContext,DownloadService.class);
         intent.setAction(DownloadService.ACTION_START);
         intent.putExtra(DownloadService.INFORMATION,fileInfo);
+        mContext.registerReceiver(this,filter);
         mContext.startService(intent);
     }
     public void downloadWithFileInfo(FileInfo info) {
@@ -43,7 +50,7 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         intent.setClass(mContext,DownloadService.class);
         intent.setAction(DownloadService.ACTION_START);
         intent.putExtra(DownloadService.INFORMATION,info);
-        mContext.registerReceiver(this,new IntentFilter(ACTION_FINISH));
+        mContext.registerReceiver(this,filter);
         mContext.startService(intent);
     }
 
@@ -70,6 +77,9 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         if (intent.getAction().equals(ACTION_FINISH)) {
             Log.d(TAG, "onReceive: 下载成功");
             Toast.makeText(mContext,"下载成功",Toast.LENGTH_SHORT).show();
+        }
+        else if (intent.getAction().equals(ACTION_PROGRESS)) {
+
         }
     }
 }
