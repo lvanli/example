@@ -13,13 +13,9 @@ import android.widget.RemoteViews;
 
 import com.practise.lizhiguang.componentlibrary.R;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -77,13 +73,12 @@ public class DownloadService extends Service {
                     remoteViews.setProgressBar(R.id.progressBar,msg.arg1,mProgress,false);
                     builder.setContent(remoteViews);
                     startForeground(201,builder.build());
-                    if (mProgress < msg.arg1)
-                        break;
-                case FINISH:
-                    stopForeground(true);
-                    Intent intent = new Intent();
-                    intent.setAction(DownLoadManager.ACTION_FINISH);
-                    sendBroadcast(intent);
+                    if (mProgress >= msg.arg1) {
+                        stopForeground(true);
+                        Intent intent = new Intent();
+                        intent.setAction(DownLoadManager.ACTION_FINISH);
+                        sendBroadcast(intent);
+                    }
                     break;
             }
         }
@@ -139,6 +134,8 @@ public class DownloadService extends Service {
             try {
                 URL url = new URL(mFileInfo.getUrl());
                 connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(3000);
                 connection.setRequestProperty("Range", "bytes=" + begin
                         + "-" + end + "");
                 InputStream is = connection.getInputStream();
@@ -148,8 +145,10 @@ public class DownloadService extends Service {
                 accessFile.seek(begin);
                 int len = 0;
                 while ((len = is.read(buffer)) > 0) {
+                    if (isInterrupted())
+                        break;
                     Log.d(TAG, "run: get "+len+" bytes");
-                    accessFile.write(buffer);
+                    accessFile.write(buffer,0,len);
                     mHandler.obtainMessage(PROGRESS,mFileInfo.getLength(),len).sendToTarget();
                 }
                 accessFile.close();
@@ -168,6 +167,11 @@ public class DownloadService extends Service {
 
         public DownLoadPreThread(FileInfo fileInfo) {
             this.mFileInfo = fileInfo;
+        }
+
+        @Override
+        public void interrupt() {
+            super.interrupt();
         }
 
         @Override
