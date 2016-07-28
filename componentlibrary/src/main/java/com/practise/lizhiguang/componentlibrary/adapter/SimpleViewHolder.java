@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 /**
  * Created by lizhiguang on 16/7/12.
+ * holder的实现类,可以添加多种控件的支持
  */
 public class SimpleViewHolder {
     private SparseArray <View> mViews;

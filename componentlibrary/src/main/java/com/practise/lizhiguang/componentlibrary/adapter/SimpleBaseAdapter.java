@@ -9,6 +9,9 @@ import java.util.List;
 
 /**
  * Created by lizhiguang on 16/7/12.
+ * 一个简单用于listView的adapter
+ * 主要作用是抽取重复代码,省去holder相关工作
+ * 只需继承后实现getInfo即可完成adapter
  */
 public abstract class SimpleBaseAdapter<T> extends BaseAdapter {
     private Context mContext;
