@@ -1,5 +1,6 @@
 package com.practise.lizhiguang.practise.download;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +14,7 @@ import com.practise.lizhiguang.practise.R;
 
 public class DownloadActivity extends AppCompatActivity implements View.OnClickListener{
     EditText inputText;
-    Button startButton,pauseButton;
+    Button startButton,pauseButton,restartButton;
     DownLoadManager manager;
     private static final String TAG = "DownloadActivity";
     @Override
@@ -27,10 +28,12 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
         inputText = (EditText) findViewById(R.id.download_url);
         startButton = (Button) findViewById(R.id.download_start);
         pauseButton = (Button) findViewById(R.id.download_pause);
+        restartButton = (Button) findViewById(R.id.download_restart);
     }
     private void init () {
         startButton.setOnClickListener(this);
         pauseButton.setOnClickListener(this);
+        restartButton.setOnClickListener(this);
         manager = new DownLoadManager(this);
     }
 
@@ -46,6 +49,10 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                 manager.downloadWithFileInfo(fileInfo);
                 break;
             case R.id.download_pause:
+                sendBroadcast(new Intent(DownLoadManager.ACTION_PAUSE));
+                break;
+            case R.id.download_restart:
+                sendBroadcast(new Intent(DownLoadManager.ACTION_RESTART));
                 break;
         }
     }

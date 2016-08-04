@@ -30,5 +30,12 @@
         android:id="@+id/download_pause"
         android:layout_below="@+id/download_url"
         android:layout_toStartOf="@+id/download_start" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/restart"
+        android:id="@+id/download_restart"
+        android:layout_below="@+id/download_url"
+        android:layout_toStartOf="@+id/download_pause" />
 
 </RelativeLayout>

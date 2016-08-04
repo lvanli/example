@@ -15,5 +15,6 @@
     <string name="begin">开始</string>
     <string name="pause">暂停</string>
     <string name="tip">请输入url</string>
+    <string name="restart">继续</string>
     <integer name="load_speed">150</integer>
 </resources>

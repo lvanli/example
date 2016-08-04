@@ -36,6 +36,7 @@ public class DownloadService extends Service {
     public static final String ACTION_STOP = "stop";
     public static final String INFORMATION = "fileInfo";
     public static final int ACTION_INIT = 1;
+    public static final int BUFFER_SIZE = 1 * 1024 * 1024;
     private static final String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/";
     private static final int ACTION_PROGRESS = 2;
     public static final int ACTION_PAUSE = 3;
@@ -45,7 +46,7 @@ public class DownloadService extends Service {
     private Notification.Builder builder;
     private List<Thread> threads;
     private int mProgress;
-    private DbHelper mDb;
+    private DbHelper mDbHelper;
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -58,10 +59,10 @@ public class DownloadService extends Service {
                     for (int i = 0; i < MAX_THREAD; i++) {
                         DownLoadThread thread;
                         if (i != MAX_THREAD - 1) {
-                            thread = new DownLoadThread(info, oneDown * i, oneDown * (i + 1) - 1);
+                            thread = new DownLoadThread(info, oneDown * i, oneDown * (i + 1) - 1,i);
                             Log.d(TAG, "handleMessage: from " + (oneDown * i) + " to " + (oneDown * (i + 1) - 1));
                         } else {
-                            thread = new DownLoadThread(info, oneDown * i, info.getLength());
+                            thread = new DownLoadThread(info, oneDown * i, info.getLength(),i);
                             Log.d(TAG, "handleMessage: from " + (oneDown * i) + " to " + info.getLength());
                         }
                         threads.add(thread);
@@ -74,7 +75,7 @@ public class DownloadService extends Service {
                     break;
                 case ACTION_PROGRESS:
                     mProgress += msg.arg2;
-                    Log.d(TAG, "handleMessage: what=" + msg.what + ",arg1=" + msg.arg1 + ",arg2=" + msg.arg2);
+                    //Log.d(TAG, "handleMessage: what=" + msg.what + ",arg1=" + msg.arg1 + ",arg2=" + msg.arg2);
                     remoteViews.setProgressBar(R.id.progressBar, msg.arg1, mProgress, false);
                     builder.setContent(remoteViews);
                     startForeground(201, builder.build());
@@ -86,11 +87,26 @@ public class DownloadService extends Service {
                     }
                     break;
                 case ACTION_PAUSE:
+                    Log.d(TAG, "handleMessage: pause,threads.size="+threads.size());
                     for (int i = 0; i < threads.size(); i++) {
                         threads.get(i).interrupt();
                     }
+                    threads.clear();
                     break;
                 case ACTION_RESTART:
+                    List<TaskInfo> infos = mDbHelper.getInfo((String) msg.obj);
+                    for (int i = 0; i < infos.size(); i++) {
+                        TaskInfo taskInfo = infos.get(i);
+                        FileInfo fileInfo = new FileInfo();
+                        fileInfo.setUrl(taskInfo.getUrl());
+                        fileInfo.setName(DownLoadManager.getNameByUrl(taskInfo.getUrl()));
+                        fileInfo.setFinish(taskInfo.getFinished());
+                        fileInfo.setLength(taskInfo.getEnd() - taskInfo.getStart());
+                        DownLoadThread thread = new DownLoadThread(fileInfo, taskInfo.getStart() + taskInfo.getFinished(), taskInfo.getEnd(),i);
+                        Log.d(TAG, "handleMessage: from " + (taskInfo.getStart() + taskInfo.getFinished()) + " to " + taskInfo.getEnd());
+                        threads.add(thread);
+                        thread.start();
+                    }
                     break;
             }
         }
@@ -105,6 +121,7 @@ public class DownloadService extends Service {
         builder.setContentTitle("下载").setContentText("正在下载").setSmallIcon(R.drawable.loading);
         remoteViews.setOnClickPendingIntent(R.id.download_pause, PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(DownLoadManager.ACTION_PAUSE), 0));
         remoteViews.setOnClickPendingIntent(R.id.download_start, PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(DownLoadManager.ACTION_RESTART), 0));
+        mDbHelper = DbHelper.getInstance(getApplicationContext());
     }
 
     class MyBinder extends Binder {
@@ -145,36 +162,46 @@ public class DownloadService extends Service {
 
     class DownLoadThread extends Thread {
         private FileInfo mFileInfo = null;
-        int begin, end;
+        int begin, end,id;
 
-        public DownLoadThread(FileInfo mFileInfo, int begin, int end) {
+        public DownLoadThread(FileInfo mFileInfo, int begin, int end,int id) {
             this.mFileInfo = mFileInfo;
             this.begin = begin;
             this.end = end;
+            this.id = id;
         }
 
         @Override
         public void run() {
             super.run();
+            TaskInfo info = new TaskInfo(mFileInfo.getUrl(),begin,end,0,id);
+            if (!mDbHelper.isExists(mFileInfo.getUrl(),id))
+                mDbHelper.saveInfo(info);
             HttpURLConnection connection = null;
             try {
                 URL url = new URL(mFileInfo.getUrl());
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(3000);
-                connection.setRequestProperty("Range", "bytes=" + begin
+                connection.setRequestProperty("Range", "bytes=" + (begin + mFileInfo.getFinish())
                         + "-" + end + "");
                 InputStream is = connection.getInputStream();
-                byte buffer[] = new byte[4 * 1024 * 1024];
+                byte buffer[] = new byte[BUFFER_SIZE];
                 File file = new File(PATH, mFileInfo.getName());
                 RandomAccessFile accessFile = new RandomAccessFile(file, "rwd");
-                accessFile.seek(begin);
+                accessFile.seek(begin + mFileInfo.getFinish());
                 int len = 0;
                 while ((len = is.read(buffer)) > 0) {
                     if (isInterrupted())
                         break;
                     Log.d(TAG, "run: get " + len + " bytes");
                     accessFile.write(buffer, 0, len);
+                    mFileInfo.setFinish(mFileInfo.getFinish() + len);
+                    info.setFinished(mFileInfo.getFinish());
+                    if (len < end  - mFileInfo.getFinish() + begin)
+                        mDbHelper.updateInfo(info);
+                    else
+                        mDbHelper.deleteInfo(info);
                     mHandler.obtainMessage(ACTION_PROGRESS, mFileInfo.getLength(), len).sendToTarget();
                 }
                 accessFile.close();

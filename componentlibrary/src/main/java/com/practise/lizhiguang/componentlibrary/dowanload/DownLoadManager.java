@@ -60,8 +60,8 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         intent.setClass(mContext,DownloadService.class);
         intent.setAction(DownloadService.ACTION_START);
         intent.putExtra(DownloadService.INFORMATION,fileInfo);
-        mContext.registerReceiver(this,filter);
         mContext.startService(intent);
+        mContext.bindService(new Intent(mContext,DownloadService.class),this,0);
     }
     /**
      * 传入参数可以自己命名下载文件名称
@@ -74,6 +74,7 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         intent.putExtra(DownloadService.INFORMATION,info);
         mContext.registerReceiver(this,filter);
         mContext.startService(intent);
+        mContext.bindService(new Intent(mContext,DownloadService.class),this,0);
     }
 
     public static String getNameByUrl(String url) {
@@ -88,16 +89,18 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
     public void onServiceConnected(ComponentName name, IBinder service) {
         DownloadService.MyBinder binder = (DownloadService.MyBinder) service;
         mServiceHandle = binder.getHandler();
+        Log.d(TAG, "onServiceConnected: mServiceHandle="+mServiceHandle);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         mServiceHandle = null;
+        Log.d(TAG, "onServiceDisconnected");
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive:"+intent.getAction());
+        Log.d(TAG, "onReceive:"+intent.getAction()+",mServiceHandle="+mServiceHandle);
         if (intent.getAction().equals(ACTION_FINISH)) {
             Toast.makeText(mContext,"下载成功",Toast.LENGTH_SHORT).show();
         }

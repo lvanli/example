@@ -10,6 +10,16 @@ public class TaskInfo {
     private int finished;
     private int id;
 
+    public TaskInfo() {}
+
+    public TaskInfo(String url, int start, int end, int finished, int id) {
+        this.url = url;
+        this.start = start;
+        this.end = end;
+        this.finished = finished;
+        this.id = id;
+    }
+
     public String getUrl() {
         return url;
     }
