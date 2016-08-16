@@ -93,6 +93,8 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
     public List<TaskInfo> getInfo(String url) {
+        if (url == null)
+            return null;
         synchronized (DbHelper.this) {
             List<TaskInfo> infos = new ArrayList<>();
             Cursor cursor;

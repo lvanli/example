@@ -23,11 +23,4 @@
         android:layout_height="wrap_content"
         android:text="暂停"
         android:id="@+id/download_pause"/>
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="下载"
-        android:id="@+id/download_start" />
 </LinearLayout>

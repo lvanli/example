@@ -14,7 +14,13 @@ public class FileInfo implements Serializable {
 
     public FileInfo() {
     }
-
+    public FileInfo(FileInfo info) {
+        this.name = info.getName();
+        this.id = info.getId();
+        this.length = info.getLength();
+        this.finish = info.getFinish();
+        this.url = info.getUrl();
+    }
     public FileInfo(String name, int id, int length, int finish, String url) {
         this.name = name;
         this.id = id;

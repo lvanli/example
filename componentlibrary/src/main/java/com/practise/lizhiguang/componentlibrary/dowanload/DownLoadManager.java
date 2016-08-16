@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,10 +29,11 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
     /**暂停下载消息*/
     public static final String ACTION_PAUSE = "com.practise.lizhiguang.action.pause";
     /**重启下载消息*/
-    public static final String ACTION_RESTART = "com.practise.lizhiguang.action.start";
+    public static final String ACTION_RESTART = "com.practise.lizhiguang.action.restart";
     private IntentFilter filter;
     //service中的handler,用来给service发消息,如果没有连接则为null
     private Handler mServiceHandle;
+    private FileInfo mCurrentFile;
     public DownLoadManager(Context context) {
         mContext = context;
         filter = new IntentFilter();
@@ -40,6 +42,7 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         filter.addAction(ACTION_PAUSE);
         filter.addAction(ACTION_RESTART);
         mServiceHandle = null;
+        mCurrentFile = null;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         intent.setClass(mContext,DownloadService.class);
         intent.setAction(DownloadService.ACTION_START);
         intent.putExtra(DownloadService.INFORMATION,fileInfo);
+        mCurrentFile = fileInfo;
         mContext.startService(intent);
         mContext.bindService(new Intent(mContext,DownloadService.class),this,0);
     }
@@ -72,6 +76,7 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         intent.setClass(mContext,DownloadService.class);
         intent.setAction(DownloadService.ACTION_START);
         intent.putExtra(DownloadService.INFORMATION,info);
+        mCurrentFile = info;
         mContext.registerReceiver(this,filter);
         mContext.startService(intent);
         mContext.bindService(new Intent(mContext,DownloadService.class),this,0);
@@ -111,7 +116,8 @@ public class DownLoadManager extends BroadcastReceiver implements ServiceConnect
         }
         else if (intent.getAction().equals(ACTION_RESTART)) {
             if (mServiceHandle != null) {
-                mServiceHandle.obtainMessage(DownloadService.ACTION_RESTART).sendToTarget();
+                Message message = Message.obtain(mServiceHandle,DownloadService.ACTION_RESTART,mCurrentFile.getUrl());
+                message.sendToTarget();
             }
         }
     }
