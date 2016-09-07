@@ -5,7 +5,7 @@
     android:layout_height="80dp">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:background="@color/error_color"
         android:id="@+id/recycle_list_text"/>

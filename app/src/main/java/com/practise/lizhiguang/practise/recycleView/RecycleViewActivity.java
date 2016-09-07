@@ -3,6 +3,7 @@ package com.practise.lizhiguang.practise.recycleView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -14,6 +15,7 @@ import com.practise.lizhiguang.practise.R;
 public class RecycleViewActivity extends AppCompatActivity {
     RecyclerView mainView;
     DividerItemDecoration mDecotarion = null;
+    RecyclerAdapter mAdapter = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,9 +27,9 @@ public class RecycleViewActivity extends AppCompatActivity {
         mainView = (RecyclerView) findViewById(R.id.recycle_main);
     }
     void init() {
-        RecyclerAdapter myAdapter = new RecyclerAdapter(this);
+        mAdapter = new RecyclerAdapter(this);
         mainView.setLayoutManager(new LinearLayoutManager(this));
-        mainView.setAdapter(myAdapter);
+        mainView.setAdapter(mAdapter);
         mainView.setItemAnimator(new DefaultItemAnimator());
         mDecotarion = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST);
         mainView.addItemDecoration(mDecotarion);
@@ -48,6 +50,7 @@ public class RecycleViewActivity extends AppCompatActivity {
                 mDecotarion = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST);
                 mainView.setLayoutManager(new LinearLayoutManager(this));
                 mainView.addItemDecoration(mDecotarion);
+                mAdapter.setMode(RecyclerAdapter.MODE_NORMAL);
                 break;
             case R.id.recycle_menu_grid:
                 if (mDecotarion != null)
@@ -55,6 +58,20 @@ public class RecycleViewActivity extends AppCompatActivity {
                 mDecotarion = new DividerItemDecoration(this,DividerItemDecoration.HORIZONTAL_LIST);
                 mainView.setLayoutManager(new StaggeredGridLayoutManager(5,StaggeredGridLayoutManager.HORIZONTAL));
                 mainView.addItemDecoration(mDecotarion);
+                mAdapter.setMode(RecyclerAdapter.MODE_NORMAL);
+                break;
+            case R.id.recycle_menu_fall:
+                mAdapter.setMode(RecyclerAdapter.MODE_FALL);
+                if (mDecotarion != null)
+                    mainView.removeItemDecoration(mDecotarion);
+                mDecotarion = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST);
+                mainView.setLayoutManager(new GridLayoutManager(this,3));
+                mainView.addItemDecoration(mDecotarion);
+                break;
+            case R.id.recycle_menu_add:
+
+                break;
+            case R.id.recycle_menu_delete:
                 break;
         }
         return super.onOptionsItemSelected(item);
