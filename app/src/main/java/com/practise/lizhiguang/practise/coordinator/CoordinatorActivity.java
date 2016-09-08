@@ -32,7 +32,10 @@ public class CoordinatorActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.coordinator_viewpager);
     }
     void init() {
-        RecyclerAdapter myAdapter = new RecyclerAdapter(this);
+        ArrayList<Integer> datas = new ArrayList<>(10);
+        for (int i=0;i<10;i++)
+            datas.add(i);
+        RecyclerAdapter myAdapter = new RecyclerAdapter(this,datas);
         RecyclerView view1 = new RecyclerView(this);
         view1.setLayoutManager(new LinearLayoutManager(this));
         view1.setAdapter(myAdapter);

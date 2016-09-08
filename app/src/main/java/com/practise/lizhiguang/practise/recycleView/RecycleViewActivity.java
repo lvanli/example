@@ -12,6 +12,9 @@ import android.view.MenuItem;
 
 import com.practise.lizhiguang.practise.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecycleViewActivity extends AppCompatActivity {
     RecyclerView mainView;
     DividerItemDecoration mDecotarion = null;
@@ -27,12 +30,20 @@ public class RecycleViewActivity extends AppCompatActivity {
         mainView = (RecyclerView) findViewById(R.id.recycle_main);
     }
     void init() {
-        mAdapter = new RecyclerAdapter(this);
+        mAdapter = new RecyclerAdapter(this,getData());
         mainView.setLayoutManager(new LinearLayoutManager(this));
         mainView.setAdapter(mAdapter);
         mainView.setItemAnimator(new DefaultItemAnimator());
         mDecotarion = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST);
         mainView.addItemDecoration(mDecotarion);
+    }
+
+    List<Integer> getData() {
+        ArrayList<Integer> data = new ArrayList<>(40);
+        for (int i=0;i<40;i++) {
+            data.add(i);
+        }
+        return  data;
     }
 
     @Override
@@ -64,14 +75,13 @@ public class RecycleViewActivity extends AppCompatActivity {
                 mAdapter.setMode(RecyclerAdapter.MODE_FALL);
                 if (mDecotarion != null)
                     mainView.removeItemDecoration(mDecotarion);
-                mDecotarion = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST);
-                mainView.setLayoutManager(new GridLayoutManager(this,3));
-                mainView.addItemDecoration(mDecotarion);
+                mainView.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
                 break;
             case R.id.recycle_menu_add:
-
+                mAdapter.addData(99,1);
                 break;
             case R.id.recycle_menu_delete:
+                mAdapter.deleteData(1);
                 break;
         }
         return super.onOptionsItemSelected(item);
