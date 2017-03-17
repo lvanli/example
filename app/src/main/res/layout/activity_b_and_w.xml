@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.practise.lizhiguang.practise.blackWrite.BAndWActivity">
+
+    <com.practise.lizhiguang.componentlibrary.widget.BWClickImpl
+        android:id="@+id/bw_impl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:maxLine="5"
+        app:beginHeight="-200"
+        app:touchedColor="@color/BLUE"
+        app:untouchedColor="@color/RED"
+        />
+</android.support.v7.widget.LinearLayoutCompat>

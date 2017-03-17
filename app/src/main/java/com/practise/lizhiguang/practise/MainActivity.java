@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import com.practise.lizhiguang.componentlibrary.dowanload.DownloadService;
 import com.practise.lizhiguang.practise.audio.AudioActivity;
+import com.practise.lizhiguang.practise.blackWrite.BAndWActivity;
 import com.practise.lizhiguang.practise.coordinator.CoordinatorActivity;
 import com.practise.lizhiguang.practise.download.DownloadActivity;
 import com.practise.lizhiguang.practise.floatMenu.FloatMenuActivity;
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.button_download:
                 startActivity(new Intent(MainActivity.this, DownloadActivity.class));
+                break;
+            case R.id.button_black_and_write:
+                startActivity(new Intent(MainActivity.this, BAndWActivity.class));
                 break;
         }
     }
