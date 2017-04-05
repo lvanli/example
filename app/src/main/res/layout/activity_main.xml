@@ -87,7 +87,7 @@
         android:onClick="onClick"
         android:text="@string/download"
         android:id="@+id/button_download"
-        android:layout_alignParentTop="true"HEAD
+        android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/button_loading"/>
     <Button
         android:layout_width="wrap_content"
@@ -96,5 +96,5 @@
         android:text="黑白快"
         android:id="@+id/button_black_and_write"
         android:layout_below="@+id/button_download"
-        android:layout_toEndOf="@+id/button_audio" />
+        android:layout_toRightOf="@+id/button_audio" />
 </RelativeLayout>
