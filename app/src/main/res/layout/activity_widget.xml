@@ -3,7 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.practise.lizhiguang.practise.widget.WidgetActivity">
+    <com.practise.lizhiguang.componentlibrary.widget.GuaGuaView
+        android:id="@+id/widget_gua_view"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:src="@drawable/loading_bg"
+        />
+    <com.practise.lizhiguang.componentlibrary.widget.RollTextView
+        android:id="@+id/widget_roll_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
