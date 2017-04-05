@@ -31,7 +31,8 @@
 
         <activity android:name=".floatMenu.FloatMenuActivity" />
         <activity android:name=".widget.WidgetActivity" />
-        <activity android:name=".download.DownloadActivity"></activity>
+        <activity android:name=".download.DownloadActivity" />
+        <activity android:name=".blackWrite.BAndWActivity"></activity>
     </application>
 
 </manifest>

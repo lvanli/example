@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BWClickImpl">
+        <attr name="untouchedColor" format="color"/>
+        <attr name="touchedColor" format="color"/>
+        <attr name="maxLine" format="integer"/>
+        <attr name="beginHeight" format="integer" />
+    </declare-styleable>
+    <color name="RED">#FF0000</color>
+    <color name="GREEN">#00FF00</color>
+    <color name="BLUE">#0000FF</color>
+</resources>
