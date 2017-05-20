@@ -32,7 +32,9 @@
         <activity android:name=".floatMenu.FloatMenuActivity" />
         <activity android:name=".widget.WidgetActivity" />
         <activity android:name=".download.DownloadActivity" />
-        <activity android:name=".blackWrite.BAndWActivity"></activity>
+        <activity android:name=".blackWrite.BAndWActivity" />
+        <activity android:name=".layout.TabHostActivity" />
+        <activity android:name=".network.NetworkActivity"></activity>
     </application>
 
 </manifest>

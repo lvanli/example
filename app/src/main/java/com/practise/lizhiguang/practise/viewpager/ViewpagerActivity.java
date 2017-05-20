@@ -1,12 +1,15 @@
 package com.practise.lizhiguang.practise.viewpager;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,6 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.practise.lizhiguang.practise.R;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ViewpagerActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = "myDebug";
@@ -25,12 +32,31 @@ public class ViewpagerActivity extends AppCompatActivity implements View.OnClick
         bindWidget();
         init();
     }
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+                mainViewPager.setCurrentItem(mainViewPager.getCurrentItem() + 1);
+            }
+            super.handleMessage(msg);
+        }
+    };
+    MyPagerAdapter adapter;
     void bindWidget () {
         mainViewPager = (ViewPager) findViewById(R.id.viewpager_main);
     }
     void init () {
         mainViewPager.setPageTransformer(true,new ZoomOutPageTransformer());
-        mainViewPager.setAdapter(getNormalAdapter());
+        adapter = (MyPagerAdapter) getNormalAdapter();
+        adapter.setMainView(mainViewPager);
+        mainViewPager.setAdapter(adapter);
+        mainViewPager.setCurrentItem(mainViewPager.getAdapter().getCount()/3);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(1);
+            }
+        },1000,2000);
     }
     public MyFragmentStatePagerAdapter getFragmentStateAdapter() {
         //自动销毁fragment,加载多个fragment内存压力不大,但是由于每次都要加载都要创建,对性能要求高
@@ -53,31 +79,13 @@ public class ViewpagerActivity extends AppCompatActivity implements View.OnClick
         return myFragmentPagerAdapter;
     }
     public PagerAdapter getNormalAdapter() {
-        MyPagerAdapter myPagerAdapter = new MyPagerAdapter();
-        TextView textView = new TextView(this);
-        TextView textView2 = new TextView(this);
-        TextView textView3 = new TextView(this);
-        TextView textView4 = new TextView(this);
-        TextView textView5 = new TextView(this);
-        TextView textView6 = new TextView(this);
-        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView.setText("11111111");
-        textView2.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView2.setText("22222222");
-        textView3.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView3.setText("33333333");
-        textView4.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView4.setText("4444444");
-        textView5.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView5.setText("55555555");
-        textView6.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView6.setText("666666666");
-        myPagerAdapter.allViews.add(textView);
-        myPagerAdapter.allViews.add(textView2);
-        myPagerAdapter.allViews.add(textView3);
-        myPagerAdapter.allViews.add(textView4);
-        myPagerAdapter.allViews.add(textView5);
-        myPagerAdapter.allViews.add(textView6);
+        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(this);
+        myPagerAdapter.getTexts().add("111111");
+        myPagerAdapter.getTexts().add("222222");
+        myPagerAdapter.getTexts().add("333333");
+        myPagerAdapter.getTexts().add("444444");
+        myPagerAdapter.getTexts().add("555555");
+        myPagerAdapter.getTexts().add("666666");
         myPagerAdapter.getTitles().add("1");
         myPagerAdapter.getTitles().add("2");
         myPagerAdapter.getTitles().add("3");

@@ -73,6 +73,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter {
             tv = (TextView) itemView.findViewById(R.id.recycle_list_text);
         }
     }
+    public int getItemData(int position) {
+        if (position < datas.size())
+            return datas.get(position);
+        else
+            return 0;
+    }
 
     @Override
     public int getItemCount() {

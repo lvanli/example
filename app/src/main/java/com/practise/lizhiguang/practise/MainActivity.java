@@ -14,7 +14,9 @@ import com.practise.lizhiguang.practise.download.DownloadActivity;
 import com.practise.lizhiguang.practise.floatMenu.FloatMenuActivity;
 import com.practise.lizhiguang.practise.fragment.FragmentActivity;
 import com.practise.lizhiguang.practise.handle.HandleActivity;
+import com.practise.lizhiguang.practise.layout.TabHostActivity;
 import com.practise.lizhiguang.practise.loading.LoadingActivity;
+import com.practise.lizhiguang.practise.network.NetworkActivity;
 import com.practise.lizhiguang.practise.recycleView.RecycleViewActivity;
 import com.practise.lizhiguang.practise.service.MyFrontService;
 import com.practise.lizhiguang.practise.service.ServiceActivity;
@@ -69,6 +71,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.button_black_and_write:
                 startActivity(new Intent(MainActivity.this, BAndWActivity.class));
+                break;
+            case R.id.button_tab:
+                startActivity(new Intent(MainActivity.this, TabHostActivity.class));
+                break;
+            case R.id.button_network:
+                startActivity(new Intent(MainActivity.this, NetworkActivity.class));
                 break;
         }
     }
